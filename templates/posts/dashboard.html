@@ -1,0 +1,19 @@
+{% extends 'common/base.html' %}
+
+{% block content %}
+    <div class="posts">
+        {% for post in posts %}
+            <div class="post">
+                <a class="post-url" href="#">
+                    <h2>{{ post.title|capfirst }}</h2>
+                    <p>{{ post.content|truncatewords:10 }}</p>
+                    <div class="post-meta">
+                        <span>Post by {{ post.author|default:"Anonymous" }} on {{ post.created_at|date:'d-M-Y' }}</span>
+                    </div>
+                </a>
+            </div>
+        {% empty %}
+            <h1 class="no-posts">No posts</h1>
+        {% endfor %}
+    </div>
+{% endblock %}
