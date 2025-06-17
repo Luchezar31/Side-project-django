@@ -1,5 +1,5 @@
 {% extends 'common/base.html' %}
-{% load markdown_extras %}
+
 
 {% block content %}
     <div class="posts">
@@ -9,7 +9,7 @@
                 <a href="{% url 'edit-post' post.pk %}">Edit</a>
                 <a href="{% url 'delete-post' post.pk %}">Delete</a>
             </div>
-            <p>{{ post.content|truncatewords:10|markdown }}</p>
+            <p>{{ post.content|truncatewords:10 }}</p>
             <div class="post-meta">
                 <span>Post by {{ post.author|default:"Anonymous" }} on {{ post.created_at|date:'d-M-Y' }}</span>
             </div>
