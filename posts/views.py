@@ -1,7 +1,8 @@
 from django.db.models import Q
+from django.forms import modelform_factory
 from django.shortcuts import render, redirect
 
-from posts.forms import PostBaseForm, PostDeleteForm, PostCreateForm, PostEditForm, SearchBarForm
+from posts.forms import PostBaseForm, PostDeleteForm, PostCreateForm, SearchBarForm
 from posts.models import Post
 
 
@@ -73,9 +74,15 @@ def details_post(request, pk):
 
 def edit_post(request, pk):
     post = Post.objects.get(pk=pk)
+
+    if request.user.is_superuser:
+        PostEditForm = modelform_factory(Post,fields="__all__")
+    else:
+        PostEditForm = modelform_factory(Post,fields=('content',))
+
     form = PostEditForm(request.POST or None, instance=post)
 
-    if request.method == 'POST' and form.is_valid():
+    if request.method == 'POST' and form.is_valid:
         form.save()
         return redirect('dashboard')
 

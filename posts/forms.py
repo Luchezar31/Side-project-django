@@ -1,5 +1,7 @@
 from django import forms
+from django.core.exceptions import ValidationError
 
+from posts.mixins import ReadOnlyMixin
 from posts.models import Post
 
 
@@ -14,11 +16,32 @@ class PostBaseForm(forms.ModelForm):
                 }
             )
         }
-        # error_message = {
-        #     'author': {
-        #         'max_length': 'Hey that is too long'
-        #     }
-        # }
+        error_messages = {
+            'author': {
+                'max_length': 'Hey that is too long'
+            }
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        title = cleaned_data.get('title')
+        content = cleaned_data.get('content')
+
+        if title in content:
+            raise ValidationError(
+                'It is not a good practice to include the title in a content!'
+            )
+        return cleaned_data
+
+    def save(self, commit=True):
+        post = super().save(commit=False)
+
+        post.author = post.author.capitalize()
+
+        if commit:
+            post.save()
+        return post
 
 
 class PostCreateForm(PostBaseForm):
@@ -29,12 +52,9 @@ class PostEditForm(PostBaseForm):
     pass
 
 
-class PostDeleteForm(PostBaseForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+class PostDeleteForm(ReadOnlyMixin,PostBaseForm):
+    pass
 
-        for field in self.fields:
-            self.fields[field].disabled = True
 
 class SearchBarForm(forms.Form):
     query = forms.CharField(

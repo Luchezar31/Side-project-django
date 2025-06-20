@@ -14,10 +14,7 @@ class BadWordsValidator:
 
     @message.setter
     def message(self, value):
-        if not value:
-            self.__message = 'The text contains bad words!'
-
-        self.__message = value
+        self.__message = value or 'Not acceptable word!'
 
     def __call__(self, value):
         for bad_word in value.split():
