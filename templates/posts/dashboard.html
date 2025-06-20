@@ -5,10 +5,10 @@
 
     {% include 'common/search-bar.html' %}
 
-    {% get_recent_posts 10 recent_posts %}
+{#    {% get_recent_posts 10 recent_posts %}#}
 
     <div class="posts">
-        {% for post in recent_posts %}
+        {% for post in posts %}
             <div class="post">
                 <a class="post-url" href="{% url 'post-details' post.pk %}">
                     <h2>{{ post.title|capfirst }}</h2>
