@@ -18,7 +18,11 @@ h1 {
     color: #333;
 }
 
-.post-url {
+a {
+    text-decoration: none;
+}
+
+#post-url {
     text-decoration: none;
 }
 
@@ -56,10 +60,12 @@ h1 {
 .post h2 {
     margin: 0;
     color: #555;
+    text-align: left;
 }
 
 .post p {
     color: #666;
+    text-align: left;
 }
 
 .post-meta {

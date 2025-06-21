@@ -1,3 +1,4 @@
+from crispy_forms.helper import FormHelper
 from django import forms
 from django.core.exceptions import ValidationError
 from django.forms import formset_factory
@@ -46,14 +47,18 @@ class PostBaseForm(forms.ModelForm):
 
 
 class PostCreateForm(PostBaseForm):
-    pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_id = 'id-exampleForm'
+        self.helper.form_class = 'blueForms'
 
 
 class PostEditForm(PostBaseForm):
     pass
 
 
-class PostDeleteForm(ReadOnlyMixin,PostBaseForm):
+class PostDeleteForm(ReadOnlyMixin, PostBaseForm):
     pass
 
 
@@ -66,20 +71,23 @@ class SearchBarForm(forms.Form):
             attrs={'placeholder': 'Search for posts...'},
         )
     )
+
+
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ['content']
         labels = {
-            'content':''
+            'content': ''
         }
         widgets = {
-            'content':forms.TextInput(
+            'content': forms.TextInput(
                 attrs={
-                    'class':'form-control',
-                    'placeholder':'Add comment...',
+                    'class': 'form-control',
+                    'placeholder': 'Add comment...',
                 }
             )
         }
 
-CommentFormSet = formset_factory(CommentForm,extra=1)
+
+CommentFormSet = formset_factory(CommentForm, extra=1)

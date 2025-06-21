@@ -1,3 +1,4 @@
+
 from django.urls import path, include
 
 from posts import views
@@ -12,3 +13,6 @@ urlpatterns = [
         path('edit/<int:pk>/',views.edit_post,name='edit-post'),
     ]))
 ]
+
+
+

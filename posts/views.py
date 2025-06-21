@@ -24,18 +24,16 @@ def dashboard(request):
             Q(author__icontains=query)
         )
 
-
-
     context = {
         'posts': posts,
-        'search_form':search_form
+        'search_form': search_form
     }
 
     return render(request, 'posts/dashboard.html', context)
 
 
 def add_post(request):
-    form = PostCreateForm(request.POST or None)
+    form = PostCreateForm(request.POST or None, request.FILES or None)
 
     if request.method == "POST" and form.is_valid():
         form.save()
@@ -73,11 +71,11 @@ def details_post(request, pk):
             comment.author = request.user.username
             comment.post = post
             comment.save()
-            return redirect('dashboard')
+            return redirect('post-details', pk=pk)
 
     context = {
         'post': post,
-        'comment_form':comment_form
+        'comment_form': comment_form
     }
 
     return render(request, 'posts/post-details.html', context)
@@ -87,9 +85,9 @@ def edit_post(request, pk):
     post = Post.objects.get(pk=pk)
 
     if request.user.is_superuser:
-        PostEditForm = modelform_factory(Post,fields="__all__")
+        PostEditForm = modelform_factory(Post, fields="__all__")
     else:
-        PostEditForm = modelform_factory(Post,fields=('content',))
+        PostEditForm = modelform_factory(Post, fields=('content',))
 
     form = PostEditForm(request.POST or None, instance=post)
 
@@ -102,4 +100,3 @@ def edit_post(request, pk):
     }
 
     return render(request, 'posts/edit-post.html', context)
-
