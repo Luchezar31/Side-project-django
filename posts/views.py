@@ -3,8 +3,9 @@ from datetime import datetime
 from django.db.models import Q
 from django.forms import modelform_factory
 from django.shortcuts import render, redirect
-from django.urls import reverse_lazy
-from django.views.generic import TemplateView, CreateView, UpdateView, DeleteView, FormView, DetailView, ListView
+from django.urls import reverse_lazy, reverse
+from django.views.generic import TemplateView, CreateView, UpdateView, DeleteView, FormView, DetailView, ListView, \
+    RedirectView
 from django.views.generic.edit import FormMixin
 
 from posts.forms import PostBaseForm, PostDeleteForm, PostCreateForm, SearchBarForm, CommentForm, CommentFormSet
@@ -28,7 +29,7 @@ class HomePageView(TemplateView):
 class Dashboard(ListView):
     template_name = 'posts/dashboard.html'
     model = Post
-    paginate_by = 2
+    paginate_by = 10
     query_param = 'query'
     form_class = SearchBarForm
 
@@ -66,8 +67,8 @@ class CreatePost(CreateView):
 
 class DeletePost(DeleteView, FormView):
     model = Post
-    success_url = reverse_lazy('dashboard')
     template_name = 'posts/delete-post.html'
+    success_url = reverse_lazy('dashboard')
     form_class = PostDeleteForm
 
     def get_initial(self):
@@ -75,7 +76,8 @@ class DeletePost(DeleteView, FormView):
         post = self.model.objects.get(pk=pk)
         return post.__dict__
 
-
+    def form_invalid(self,form):
+        return self.form_valid(form)
 class DetailPost(DetailView, FormMixin):
     model = Post
     template_name = 'posts/post-details.html'
@@ -114,3 +116,7 @@ class EditPost(UpdateView):
         if self.request.user.is_superuser:
             return modelform_factory(Post, fields='__all__')
         return modelform_factory(Post, fields=('content',))
+
+class MyRedirectView(RedirectView):
+    def get_redirect_url(self,*args,**kwargs):
+        return reverse('dashboard')

@@ -2,6 +2,7 @@
 from django.urls import path, include
 
 from posts import views
+from posts.views import MyRedirectView
 
 urlpatterns = [
     path('',views.HomePageView.as_view(),name='home-page'),
@@ -11,7 +12,8 @@ urlpatterns = [
         path('delete/<int:pk>/',views.DeletePost.as_view(),name='delete-post'),
         path('details/<int:pk>',views.DetailPost.as_view(),name='post-details'),
         path('edit/<int:pk>/',views.EditPost.as_view(),name='edit-post'),
-    ]))
+    ])),
+    path('redirect/',MyRedirectView.as_view(),name='redirect')
 ]
 
 
