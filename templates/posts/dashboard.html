@@ -5,14 +5,29 @@
 
     {% include 'common/search-bar.html' %}
 
-{#    {% get_recent_posts 10 recent_posts %}#}
+    {#    {% get_recent_posts 10 recent_posts %}#}
 
     <div class="posts">
         {% for post in post_list %}
             <div class="post">
                 <a class="post-url" href="{% url 'post-details' post.pk %}">
-                    <h2>{{ post.title|capfirst }}</h2>
-                    <p>{{ post.content|truncatewords:10 }}</p>
+                    <h2>
+                        {{ post.title|capfirst }}
+                        {% if perms.posts.approve_post and not post.approved %}
+                            <a href="#"
+                               onclick="event.preventDefault(); document.getElementById('approve-form').submit()">
+                                <i class="ai-check"></i>
+                            </a>
+                            <form id="approve-form" style="display:none;" method="post"
+                              action="{% url 'approve-post' post.pk %}">
+                            {% csrf_token %}
+                        </form>
+                        {% endif %}
+
+                    </h2>
+
+                    <p>{{ post.content|truncatewords:20 }}</p>
+
                     <div class="post-meta">
                         <span>Post by {{ post.author|default:"Anonymous" }} on {{ post.created_at|date:'d-M-Y' }}</span>
                     </div>

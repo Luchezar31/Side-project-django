@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 
+from django.urls import reverse_lazy
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -37,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'posts',
     'crispy_forms',
-    'crispy_bootstrap5'
+    'crispy_bootstrap5',
+    'accounts'
 ]
 
 MIDDLEWARE = [
@@ -69,13 +72,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'forumApp.wsgi.application'
 
+AUTHENTICATION_BACKENDS = [
+    'accounts.authentication.CustomBackend',
+    'django.contrib.auth.backends.ModelBackend'
+]
+
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "forum_app",
+        "NAME": "forum_app_project",
         "USER": "postgres",
         "PASSWORD": "ivaylo2009",
         "HOST": "127.0.0.1",
@@ -133,3 +141,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
+
+AUTH_USER_MODEL = 'accounts.ForumAppUser'
+
+LOGIN_REDIRECT_URL = reverse_lazy('dashboard')
+
+LOGOUT_REDIRECT_URL = reverse_lazy('dashboard')

@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.db.models import Q
 from django.forms import modelform_factory
 from django.shortcuts import render, redirect
@@ -26,12 +27,14 @@ class HomePageView(TemplateView):
         return ['common/home-page.html']
 
 
-class Dashboard(ListView):
+class Dashboard(ListView, PermissionRequiredMixin):
     template_name = 'posts/dashboard.html'
     model = Post
     paginate_by = 10
     query_param = 'query'
     form_class = SearchBarForm
+    permission_required = 'posts.approve_post'
+    raise_exception = False
 
     def get_context_data(self, *args, **kwargs):
         kwargs.update(
@@ -46,6 +49,9 @@ class Dashboard(ListView):
         queryset = self.model.objects.all()
         search_value = self.request.GET.get(self.query_param)
 
+        if not self.has_permission():
+            queryset = queryset.filter(approved=True)
+
         if search_value:
             queryset = queryset.filter(
                 Q(title__icontains=search_value)
@@ -58,11 +64,21 @@ class Dashboard(ListView):
         return queryset
 
 
-class CreatePost(CreateView):
+def approve_post(request, pk):
+    if request.method == 'POST':
+        post = Post.objects.get(pk=pk)
+        post.approved = True
+        post.save()
+
+    return redirect('dashboard')
+
+
+class CreatePost(LoginRequiredMixin, CreateView):
     form_class = PostCreateForm
     model = Post
     success_url = reverse_lazy('dashboard')
     template_name = 'posts/add-post.html'
+    login_url = reverse_lazy('login')
 
 
 class DeletePost(DeleteView, FormView):
@@ -76,8 +92,10 @@ class DeletePost(DeleteView, FormView):
         post = self.model.objects.get(pk=pk)
         return post.__dict__
 
-    def form_invalid(self,form):
+    def form_invalid(self, form):
         return self.form_valid(form)
+
+
 class DetailPost(DetailView, FormMixin):
     model = Post
     template_name = 'posts/post-details.html'
@@ -117,6 +135,7 @@ class EditPost(UpdateView):
             return modelform_factory(Post, fields='__all__')
         return modelform_factory(Post, fields=('content',))
 
+
 class MyRedirectView(RedirectView):
-    def get_redirect_url(self,*args,**kwargs):
+    def get_redirect_url(self, *args, **kwargs):
         return reverse('dashboard')

@@ -16,20 +16,28 @@
             <i class="ai-circle-plus"></i>
             <span>Add post</span>
         </a>
-    </li>    
-    <li class="menu-item">
-        <a href="#" class="menu-link">
-            <i class="ai-book-open"></i>
-            <span>Books</span>
-        </a>
     </li>
+    {% if not request.user.is_authenticated %}
+        <li class="menu-item">
+            <a href="{% url 'login' %}" class="menu-link">
+                <i class="ai-arrow-right-thick"></i>
+                <span>Login</span>
+            </a>
+        </li>
+    {% else %}
+        <li class="menu-item">
+            <a href="{% url 'logout' %}" class="menu-link" onclick="event.preventDefault(); document.getElementById('logout-form').submit()">
+                <i class="ai-arrow-left-thick"></i>
+                <span>Logout</span>
+            </a>
+    {% endif %}
     <li class="menu-item">
         <a href="#" class="menu-link">
             <i class="ai-bell"></i>
             <span>Notifications</span>
         </a>
     </li>
-    <li class="menu-item">    
+    <li class="menu-item">
         <a href="#" class="menu-link">
             <i class="ai-gear"></i>
             <span>Settings</span>
@@ -42,3 +50,7 @@
         </a>
     </li>
 </ul>
+
+<form style="display: none;" id="logout-form" method="post" action="{% url 'logout' %}">
+    {% csrf_token %}
+</form>
